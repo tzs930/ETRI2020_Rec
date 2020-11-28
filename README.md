@@ -1,7 +1,6 @@
 # ETRI2020: Sequential Recommendation
 
 This work is heavily based on Self-Attentive Sequential Recommendation (SASRec).
-
 Please cite their paper if you use the code or datasets:
 
 [Wang-Cheng Kang](http://kwc-oliver.com), [Julian McAuley](http://cseweb.ucsd.edu/~jmcauley/) (2018). *[Self-Attentive Sequential Recommendation.](https://cseweb.ucsd.edu/~jmcauley/pdfs/icdm18.pdf)* In Proceedings of IEEE International Conference on Data Mining (ICDM'18)
