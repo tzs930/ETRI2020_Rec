@@ -1,6 +1,6 @@
-# SASRec: Self-Attentive Sequential Recommendation
+# ETRI2020: Seqeuntial Recommendation
 
-This is our TensorFlow implementation for the paper:
+This work is heavily based on Self-Attentive Sequential Recommendation (SASRec).
 
 [Wang-Cheng Kang](http://kwc-oliver.com), [Julian McAuley](http://cseweb.ucsd.edu/~jmcauley/) (2018). *[Self-Attentive Sequential Recommendation.](https://cseweb.ucsd.edu/~jmcauley/pdfs/icdm18.pdf)* In Proceedings of IEEE International Conference on Data Mining (ICDM'18)
 
