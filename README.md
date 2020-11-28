@@ -1,4 +1,4 @@
-# ETRI2020: Seqeuntial Recommendation
+# ETRI2020: Sequential Recommendation
 
 This work is heavily based on Self-Attentive Sequential Recommendation (SASRec).
 
