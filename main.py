@@ -60,7 +60,6 @@ try:
 
         for step in tqdm(range(num_batch), total=num_batch, ncols=70, leave=False, unit='b'):
             u, seq, pos, neg = sampler.next_batch()
-            import pdb; pdb.set_trace()
             auc, loss, _ = sess.run([model.auc, model.loss, model.train_op],
                                     {model.u: u, model.input_seq: seq, model.pos: pos, model.neg: neg,
                                      model.is_training: True})
