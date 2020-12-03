@@ -12,6 +12,7 @@ def data_partition(fname):
     user_train = {}
     user_valid = {}
     user_test = {}
+    
     # assume user/item index starting from 1
     f = open('data/%s.txt' % fname, 'r')
     for line in f:
@@ -29,11 +30,11 @@ def data_partition(fname):
             user_valid[user] = []
             user_test[user] = []
         else:
-            user_train[user] = User[user][:-2]
-            user_valid[user] = []
-            user_valid[user].append(User[user][-2])
-            user_test[user] = []
-            user_test[user].append(User[user][-1])
+            user_train[user] = User[user][:-2]            
+            user_valid[user] = User[user][:-1]            
+            user_test[user] = User[user]
+
+    
     return [user_train, user_valid, user_test, usernum, itemnum]
 
 
@@ -48,13 +49,14 @@ def evaluate(model, dataset, args, sess):
         users = random.sample(xrange(1, usernum + 1), 10000)
     else:
         users = xrange(1, usernum + 1)
+
     for u in users:
 
         if len(train[u]) < 1 or len(test[u]) < 1: continue
 
         seq = np.zeros([args.maxlen], dtype=np.int32)
         idx = args.maxlen - 1
-        seq[idx] = valid[u][0]
+        seq[idx] = valid[u][-1]
         idx -= 1
         for i in reversed(train[u]):
             seq[idx] = i
@@ -62,7 +64,7 @@ def evaluate(model, dataset, args, sess):
             if idx == -1: break
         rated = set(train[u])
         rated.add(0)
-        item_idx = [test[u][0]]
+        item_idx = [test[u][-1]]
         for _ in range(100):
             t = np.random.randint(1, itemnum + 1)
             while t in rated: t = np.random.randint(1, itemnum + 1)
@@ -81,7 +83,9 @@ def evaluate(model, dataset, args, sess):
         if valid_user % 100 == 0:
             print '.',
             sys.stdout.flush()
-    import pdb; pdb.set_trace()
+
+    
+    # import pdb; pdb.set_trace()
     return NDCG / valid_user, HT / valid_user
 
 
@@ -107,7 +111,7 @@ def evaluate_valid(model, dataset, args, sess):
 
         rated = set(train[u])
         rated.add(0)
-        item_idx = [valid[u][0]]
+        item_idx = [valid[u][-1]]
         for _ in range(100):
             t = np.random.randint(1, itemnum + 1)
             while t in rated: t = np.random.randint(1, itemnum + 1)

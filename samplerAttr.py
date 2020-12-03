@@ -55,7 +55,7 @@ class WarpSampler(object):
         self.result_queue = Queue(maxsize=n_workers * 10)
         self.processors = []
 
-        attr = np.load('/home/hjhwang/Codes/SASRec/data/genome_mat.npy')
+        attr = np.load('./data/genome_mat.npy')
         for i in range(n_workers):
             self.processors.append(
                 Process(target=sample_function, args=(User,

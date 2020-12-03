@@ -15,8 +15,8 @@ def str2bool(s):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', required=True)
-parser.add_argument('--train_dir', required=True)
+parser.add_argument('--dataset', default='ml-1m', required=False)
+parser.add_argument('--train_dir', default='default', required=False)
 parser.add_argument('--batch_size', default=128, type=int)
 parser.add_argument('--lr', default=0.001, type=float)
 parser.add_argument('--maxlen', default=50, type=int)
@@ -49,6 +49,10 @@ config.allow_soft_placement = True
 sess = tf.Session(config=config)
 
 sampler = WarpSampler(user_train, usernum, itemnum, batch_size=args.batch_size, maxlen=args.maxlen, n_workers=3)
+valid_sampler = WarpSampler(user_valid, usernum, itemnum, batch_size=usernum, maxlen=args.maxlen, n_workers=1)
+test_sampler = WarpSampler(user_test, usernum, itemnum, batch_size=usernum, maxlen=args.maxlen, n_workers=1)
+
+# import IPython; IPython.embed()
 model = Model(usernum, itemnum, args)
 sess.run(tf.initialize_all_variables())
 
@@ -57,28 +61,45 @@ t0 = time.time()
 
 try:
     for epoch in range(1, args.num_epochs + 1):
-
-        for step in tqdm(range(num_batch), total=num_batch, ncols=70, leave=False, unit='b'):
+        losses = []
+        for step in tqdm(range(num_batch), total=num_batch, ncols=70, leave=False, unit='b', desc='Epoch=%d'%epoch):
             u, seq, pos, neg = sampler.next_batch()
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
+        
             auc, loss, _ = sess.run([model.auc, model.loss, model.train_op],
                                     {model.u: u, model.input_seq: seq, model.pos: pos, model.neg: neg,
                                      model.is_training: True})
+            losses.append(loss)
 
-        if epoch % 20 == 0:
+        if epoch % 5 == 0:
             t1 = time.time() - t0
             T += t1
             print 'Evaluating',
+            vu, vseq, vpos, vneg = valid_sampler.next_batch()
+            tu, tseq, tpos, tneg = test_sampler.next_batch()
+            
+            _, vloss, _ = sess.run([model.auc, model.loss, model.train_op],
+                                    {model.u: vu, model.input_seq: vseq, model.pos: vpos, model.neg: vneg,
+                                     model.is_training: False})
+            
+            _, tloss, _ = sess.run([model.auc, model.loss, model.train_op],
+                                    {model.u: tu, model.input_seq: tseq, model.pos: tpos, model.neg: tneg,
+                                     model.is_training: False})
+            
+            train_loss = np.mean(losses)
+            # import IPython; IPython.embed()
+
             t_test = evaluate(model, dataset, args, sess)
             t_valid = evaluate_valid(model, dataset, args, sess)
             print ''
-            print 'epoch:%d, time: %f(s), valid (NDCG@10: %.4f, HR@10: %.4f), test (NDCG@10: %.4f, HR@10: %.4f)' % (
-            epoch, T, t_valid[0], t_valid[1], t_test[0], t_test[1])
+            print 'epoch:%d, time: %f(s), valid (NDCG@10: %.4f, HR@10: %.4f, Loss: %.4f), test (NDCG@10: %.4f, HR@10: %.4f,  Loss: %.4f)' % \
+                (epoch, T, t_valid[0], t_valid[1], vloss, t_test[0], t_test[1], tloss)
 
-            f.write(str(t_valid) + ' ' + str(t_test) + '\n')
+            f.write(str(t_valid) + ' ' + str(t_test)  + ' ' + str(train_loss) + ' ' + str(vloss) + ' '  +  str(tloss) + '\n')
             f.flush()
             t0 = time.time()
-except:
+except Exception as e:
+    print(e)
     sampler.close()
     f.close()
     exit(1)

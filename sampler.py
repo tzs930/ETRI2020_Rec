@@ -18,6 +18,7 @@ def sample_function(user_train, usernum, itemnum, batch_size, maxlen, result_que
         seq = np.zeros([maxlen], dtype=np.int32)
         pos = np.zeros([maxlen], dtype=np.int32)
         neg = np.zeros([maxlen], dtype=np.int32)
+
         nxt = user_train[user][-1]
         idx = maxlen - 1
 
