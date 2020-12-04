@@ -1,0 +1,4 @@
+*.pyc
+.vscode/
+ml-1m_default/
+ml-1m_default/*

@@ -71,11 +71,13 @@ class Model():
         neg = tf.reshape(neg, [tf.shape(self.input_seq)[0] * args.maxlen])
         pos_emb = tf.nn.embedding_lookup(item_emb_table, pos)
         neg_emb = tf.nn.embedding_lookup(item_emb_table, neg)
-        seq_emb = tf.reshape(self.seq, [tf.shape(self.input_seq)[0] * args.maxlen, args.hidden_units])
+        seq_emb = tf.reshape(self.seq, [tf.shape(self.input_seq)[0] * args.maxlen, args.hidden_units])   # (batch * maxlen, num_hidden)
 
         self.test_item = tf.placeholder(tf.int32, shape=(101))
-        test_item_emb = tf.nn.embedding_lookup(item_emb_table, self.test_item)
-        self.test_logits = tf.matmul(seq_emb, tf.transpose(test_item_emb))
+
+        test_item_emb = tf.nn.embedding_lookup(item_emb_table, self.test_item)   # (batch, 101, num_hidden)
+        
+        self.test_logits = tf.matmul(seq_emb, tf.transpose(test_item_emb))       # (batch, num_hidden, 101)
         self.test_logits = tf.reshape(self.test_logits, [tf.shape(self.input_seq)[0], args.maxlen, 101])
         self.test_logits = self.test_logits[:, -1, :]
 
@@ -92,6 +94,7 @@ class Model():
         reg_losses = tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES)
         self.loss += sum(reg_losses)
 
+
         tf.summary.scalar('loss', self.loss)
         self.auc = tf.reduce_sum(
             ((tf.sign(self.pos_logits - self.neg_logits) + 1) / 2) * istarget
@@ -106,7 +109,12 @@ class Model():
             tf.summary.scalar('test_auc', self.auc)
 
         self.merged = tf.summary.merge_all()
+        
+
 
     def predict(self, sess, u, seq, item_idx):
-        return sess.run(self.test_logits,
+        
+        test_logit = sess.run(self.test_logits,
                         {self.u: u, self.input_seq: seq, self.test_item: item_idx, self.is_training: False})
+        
+        return test_logit
