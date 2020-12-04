@@ -1,14 +1,9 @@
-# SASRec: Self-Attentive Sequential Recommendation
+# ETRI2020: Sequential Recommendation
 
-This is our TensorFlow implementation for the paper:
+This work is heavily based on Self-Attentive Sequential Recommendation (SASRec).
+Please cite their paper if you use the code or datasets:
 
 [Wang-Cheng Kang](http://kwc-oliver.com), [Julian McAuley](http://cseweb.ucsd.edu/~jmcauley/) (2018). *[Self-Attentive Sequential Recommendation.](https://cseweb.ucsd.edu/~jmcauley/pdfs/icdm18.pdf)* In Proceedings of IEEE International Conference on Data Mining (ICDM'18)
-
-Please cite our paper if you use the code or datasets.
-
-The code is tested under a Linux desktop (w/ GTX 1080 Ti GPU) with TensorFlow 1.12 and Python 2.
-
-Refer to *[here](https://github.com/pmixer/SASRec.pytorch)* for PyTorch implementation (thanks to pmixer).
 
 ## Datasets
 
@@ -55,7 +50,7 @@ python main.py --dataset=Video --train_dir=default
 or on `ml-1m`:
 
 ```
-python main.py --dataset=ml-1m --train_dir=default --maxlen=200 --dropout_rate=0.2 
+python mainAttr.py --dataset=ml-1m --train_dir=default --maxlen=200 --dropout_rate=0.2 
 ``` 
 
 ## Misc
